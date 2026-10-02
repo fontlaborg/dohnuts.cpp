@@ -240,6 +240,11 @@ CLI 还可运行 `decider`、`thisthat`、`kev`、`tev1`、`jet`、`jpt` 与 `ne
 `"profile": "neohorsejev"`），无需额外开关。`--profile` 可覆盖文件中的声明，默认值为
 `dohnuts`。`kev` 与 `neohorsejev` 还需额外传入 `--head`：
 
+JPT 使用禁用思考的文本 chat 提示，并读取 `Answer:` 后的上下文标签 token。
+其 yes/no 概率对应肯定标签；JPT 的选项顺序将该标签放在第一位。
+Jet 的 choice 读取字母 logits，score 读取数字 logits，yes/no 读取 `no`/`yes` logits。
+两者均使用嵌入 tokenizer 模板中的 Qwen3.5 assistant 回合。
+
 ```sh
 # decider：无需打分头，温度来自 decider.json
 build/dohnuts-cli --model work/side/decider-0.8b-q8_0.gguf \
