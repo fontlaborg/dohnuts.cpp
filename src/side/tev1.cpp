@@ -81,10 +81,12 @@ public:
                 throw std::invalid_argument("choice requires criteria");
             }
         } else if (type == "score") {
-            if (!criteria.is_object()) throw std::invalid_argument("score requires criteria");
+            if (!criteria.is_object() && !criteria.is_array())
+                throw std::invalid_argument("score requires criteria");
             std::vector<std::pair<double, json>> ordered;
+            size_t index = 0;
             for (auto c = criteria.begin(); c != criteria.end(); ++c)
-                ordered.emplace_back(std::stod(c.key()), c.value());
+                ordered.emplace_back(criteria.is_array() ? double(index++) : std::stod(c.key()), c.value());
             std::sort(ordered.begin(), ordered.end(),
                       [](const auto & a, const auto & b) { return a.first < b.first; });
             for (size_t k = 0; k < ordered.size(); ++k) {
