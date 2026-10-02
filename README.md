@@ -1,4 +1,5 @@
 # dohnuts.cpp
+<!-- this_file: README.md -->
 
 English | [简体中文](README.zh-CN.md)
 
@@ -258,6 +259,12 @@ Pass the matching model config as `--metadata`; the file names its own profile
 `"profile": "neohorsejev"`), so no flag is needed. `--profile` overrides the
 file, and `dohnuts` is the default. `kev` and `neohorsejev` additionally need
 `--head`:
+
+JPT uses the text chat prompt with thinking disabled and contextual label tokens
+after `Answer:`. Its yes/no probability follows the affirmative label, which
+comes first in JPT's option order. Jet reads letter logits for choices, digit
+logits for scores, and `no`/`yes` logits for yes/no questions. Both use the
+Qwen3.5 assistant turn from the embedded tokenizer template.
 
 ```sh
 # decider: no scorer head, one temperature from decider.json

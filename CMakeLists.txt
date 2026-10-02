@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
+# this_file: CMakeLists.txt
 project(dohnuts-llama CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -84,4 +85,12 @@ target_include_directories(dohnuts-cli PRIVATE
 target_link_libraries(dohnuts-cli PRIVATE llama mtmd Threads::Threads)
 if(WIN32)
     target_link_libraries(dohnuts-cli PRIVATE ws2_32)  # Winsock for cpp-httplib
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(dohnuts-side-tests tests/side_helpers.cpp)
+    target_include_directories(dohnuts-side-tests PRIVATE include third_party)
+    target_link_libraries(dohnuts-side-tests PRIVATE llama)
+    add_test(NAME side_boolean_labels COMMAND dohnuts-side-tests)
 endif()

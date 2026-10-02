@@ -1,4 +1,5 @@
 // Shared helpers for the side decision-model profiles. Internal to the
+// this_file: include/dohnuts/side/common.hpp
 // dohnuts-side library.
 #pragma once
 
@@ -69,6 +70,14 @@ inline std::vector<float> read_floats(const std::filesystem::path & path, size_t
 }
 
 inline double rounded(double value) { return std::nearbyint(value * 10000.0) / 10000.0; }
+
+inline double noul_probability(const std::vector<std::string> & keys, const std::vector<double> & p) {
+    if (keys.size() != 2 || p.size() != 2)
+        throw std::invalid_argument("noul requires two labels and probabilities");
+    for (size_t k = 0; k < keys.size(); ++k)
+        if (keys[k] == "true" || keys[k] == "yes") return p[k];
+    throw std::invalid_argument("noul requires an affirmative label");
+}
 
 inline std::vector<double> softmax(const std::vector<double> & logits, double temperature) {
     const double maximum = *std::max_element(logits.begin(), logits.end());

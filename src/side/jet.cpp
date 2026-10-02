@@ -1,4 +1,5 @@
 #include "dohnuts/side/profile.hpp"
+// this_file: src/side/jet.cpp
 
 #include <algorithm>
 #include <cmath>
@@ -21,7 +22,7 @@ constexpr const char * SYSTEM =
     "You are Jet, a decision model. Read the state and the question, then answer "
     "with exactly one label from the allowed labels.";
 
-constexpr const char * ASSISTANT_SUFFIX = "<|im_assistant|>\n<|think|>\n\n<|/think|>\n\n";
+constexpr const char * ASSISTANT_SUFFIX = "<|im_start|>assistant\n<think>\n\n</think>\n\n";
 
 // Label text for option index j: A..Z then AA, AB, ... (mirrors
 // build_single_token_labels' ordering). Used for the prompt, not the readout.
@@ -50,7 +51,7 @@ std::string state_text(const json & state) {
             return text;
         }
     }
-    return dump_python(state);
+    return state.dump(2);
 }
 
 std::string chat_prefix(const std::string & user) {
@@ -63,7 +64,7 @@ std::string render_user(const std::string & state, const std::string & type,
                         const std::vector<std::string> & labels,
                         const std::vector<std::string> & keys,
                         const std::vector<std::string> & descs) {
-    std::string out = "<state>\n" + state + "\n</state>\n";
+    std::string out = "<state>\n" + state + "\n</state>\n\n";
     out += "Question: " + instructions + "\n";
     if (type == "choice") {
         out += "Options:\n";
@@ -143,7 +144,16 @@ public:
         row.ids = back.tokenize(chat_prefix(user), true);
         if (row.ids.size() > max_state_tokens) row.ids.resize(max_state_tokens);
         row.slot_rel = (int) row.ids.size() - 1;
-        row.letters.assign(labels.begin(), labels.begin() + (std::ptrdiff_t) n);
+        if (qtype == "choice") {
+            row.letters.assign(labels.begin(), labels.begin() + (std::ptrdiff_t) n);
+        } else {
+            for (const auto & label : lab) {
+                const auto ids = back.tokenize(label, false);
+                if (ids.size() != 1)
+                    throw std::invalid_argument("Jet score/noul labels must each be one token");
+                row.letters.push_back(ids[0]);
+            }
+        }
         row.temperature = (qtype == "choice") ? t_choice
                         : (qtype == "score") ? t_score : t_noul;
         rows.push_back(std::move(row));

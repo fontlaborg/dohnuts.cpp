@@ -1,4 +1,5 @@
 #include "dohnuts/side.hpp"
+// this_file: src/side.cpp
 
 #include <fstream>
 #include <numeric>
@@ -24,7 +25,7 @@ json common_answer(const side::planned_question & q, const std::vector<double> &
     const size_t best = std::max_element(p.begin(), p.end()) - p.begin();
     json answer = {{"type", q.type}, {"confidence", side::rounded(side::entropy_confidence(p))}};
     if (q.type == "noul") {
-        answer["noul"] = side::rounded(p[1]);
+        answer["noul"] = side::rounded(side::noul_probability(q.keys, p));
     } else {
         json probabilities = json::object();
         for (size_t k = 0; k < count; ++k) probabilities[q.keys[k]] = side::rounded(p[k]);
